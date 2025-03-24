@@ -4,6 +4,6 @@ import io.github.smiley4.ktorswaggerui.dsl.routes.OpenApiRoute
 
 object AuthSwagger {
     fun OpenApiRoute.createSwaggerDefinition() {
-
+        // todo
     }
 }

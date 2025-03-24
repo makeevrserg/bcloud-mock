@@ -25,6 +25,9 @@ internal class DaoImpl(
     override suspend fun insertUserToken(
         token: String
     ): Result<Unit> = runCatching {
+        // Don't add same token twice
+        if (getUserByToken(token).isSuccess) return@runCatching
+
         val user = busyCloudApi.authMe(token).getOrThrow()
 
         transaction(requireDatabase()) {

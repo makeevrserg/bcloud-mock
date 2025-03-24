@@ -21,4 +21,5 @@ rootProject.name = "backend"
 
 include(":modules:build-konfig")
 include(":modules:core")
+include(":modules:data")
 include(":web-api")

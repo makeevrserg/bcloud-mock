@@ -1,0 +1,8 @@
+.gradle
+.idea
+build
+
+modules/build-konfig/build
+modules/core/build
+
+web-api/build

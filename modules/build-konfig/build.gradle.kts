@@ -34,11 +34,6 @@ buildConfig {
         name = "PROJECT_DESC",
         value = requireProjectInfo.description
     )
-    buildConfigField(
-        type = String::class.java,
-        name = "IR_FOLDER_PATH",
-        value = rootProject.file("IRDB").resolve("database").absolutePath
-    )
 
     buildConfigField(
         type = String::class.java,

@@ -1,4 +1,6 @@
-package com.flipperdevices.bcloudmock.core.model
+package com.flipperdevices.bcloudmock.model
+
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -42,6 +42,10 @@ dependencies {
     // Services
     implementation(projects.modules.buildKonfig)
     implementation(projects.modules.core)
+    implementation(projects.modules.model)
+    implementation(projects.modules.dao)
+    implementation(projects.modules.data)
+    implementation(projects.modules.busycloud)
 }
 
 application {

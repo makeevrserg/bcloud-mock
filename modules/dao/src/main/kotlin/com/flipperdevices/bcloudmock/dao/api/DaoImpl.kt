@@ -24,9 +24,9 @@ internal class DaoImpl(
 
     override suspend fun insertUserToken(
         token: String
-    ): Result<Unit> = runCatching {
+    ): Result<BSBApiUserObject> = runCatching {
         // Don't add same token twice
-        if (getUserByToken(token).isSuccess) return@runCatching
+        if (getUserByToken(token).isSuccess) error("User already exist with this token")
 
         val user = busyCloudApi.authMe(token).getOrThrow()
 
@@ -45,9 +45,10 @@ internal class DaoImpl(
                 it[FirebaseTokenTable.user_id] = id
             }
         }
+        user
     }
 
-    override suspend fun getUserByToken(token: String): Result<List<BSBApiUserObject>> {
+    override suspend fun getUserByToken(token: String): Result<BSBApiUserObject> {
         return runCatching {
             transaction(requireDatabase()) {
                 val userIds = FirebaseTokenTable.select(FirebaseTokenTable.user_id)
@@ -65,7 +66,7 @@ internal class DaoImpl(
                             createdAt = resultRow[UserTable.createdAt].toKotlinLocalDateTime(),
                             updatedAt = resultRow[UserTable.updatedAt].toKotlinLocalDateTime(),
                         )
-                    }
+                    }.first()
             }
         }
     }

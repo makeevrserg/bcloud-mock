@@ -6,7 +6,7 @@ interface Dao {
     /**
      * Inserts new token and fetch information about user
      */
-    suspend fun insertUserToken(token: String): Result<Unit>
+    suspend fun insertUserToken(token: String): Result<BSBApiUserObject>
 
-    suspend fun getUserByToken(token: String): Result<List<BSBApiUserObject>>
+    suspend fun getUserByToken(token: String): Result<BSBApiUserObject>
 }

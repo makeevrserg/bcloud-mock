@@ -38,7 +38,7 @@ buildConfig {
     buildConfigField(
         type = String::class.java,
         name = "FALLBACK_DB_FULL_PATH",
-        value = rootProject.file("DB_FILE").absolutePath
+        value = rootProject.file("build").resolve("DB_FILE").absolutePath
     )
 }
 

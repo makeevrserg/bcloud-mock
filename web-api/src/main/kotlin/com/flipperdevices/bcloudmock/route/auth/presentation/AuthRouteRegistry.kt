@@ -16,6 +16,7 @@ class AuthRouteRegistry(
             body = {
                 val context = this.call
                 val token = context.request.headers["Authorization"] ?: error("Token is required")
+                println("Token: $token")
                 val insertedUser = dao.insertUserToken(token).getOrThrow()
                 context.respond(insertedUser)
             }

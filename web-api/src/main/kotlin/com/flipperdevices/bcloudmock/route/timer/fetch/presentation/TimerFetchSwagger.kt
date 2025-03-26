@@ -19,7 +19,7 @@ object TimerFetchSwagger {
         response {
             HttpStatusCode.OK to {
                 description = "Timer timestamp saved"
-                body<TimerTimestamp.Pending> {
+                body<TimerTimestamp> {
                     description = "Last remembered timestamp"
                     example("Example Pending") {
                         description = "Not started and pending"

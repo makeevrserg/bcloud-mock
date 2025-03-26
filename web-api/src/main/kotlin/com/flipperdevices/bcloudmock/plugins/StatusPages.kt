@@ -1,8 +1,8 @@
 package com.flipperdevices.bcloudmock.plugins
 
 import com.flipperdevices.bcloudmock.buildkonfig.BuildKonfig
-import com.flipperdevices.bcloudmock.core.model.ErrorResponseModel
-import com.flipperdevices.bcloudmock.core.model.ErrorType
+import com.flipperdevices.bcloudmock.model.ErrorResponseModel
+import com.flipperdevices.bcloudmock.model.ErrorType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.application.install

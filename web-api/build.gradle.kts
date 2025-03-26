@@ -49,7 +49,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("com.flipperdevices.bcloudmock.core.buildkonfig.MainKt")
+    mainClass.set("com.flipperdevices.bcloudmock.MainKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")

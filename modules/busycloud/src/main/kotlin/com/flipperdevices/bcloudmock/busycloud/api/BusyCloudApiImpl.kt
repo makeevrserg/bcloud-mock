@@ -8,6 +8,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
+@Suppress("UnusedPrivateProperty")
 internal class BusyCloudApiImpl(private val httpClient: HttpClient) : BusyCloudApi {
     override suspend fun authMe(
         token: String

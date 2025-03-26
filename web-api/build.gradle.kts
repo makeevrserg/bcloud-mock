@@ -33,6 +33,7 @@ dependencies {
     }
     // Serialization
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlin.datetime)
     // Log
     implementation(libs.logback.classic)
     // Exposed

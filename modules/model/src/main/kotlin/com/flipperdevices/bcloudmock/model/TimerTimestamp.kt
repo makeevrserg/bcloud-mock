@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
+@SerialName("TIMER_TIMESTAMP")
 sealed interface TimerTimestamp {
     @SerialName("last_sync")
     val lastSync: Instant
@@ -35,7 +36,7 @@ sealed interface TimerTimestamp {
      * @param lastSync time when sync of this item was received on device
      */
     @Serializable
-    @SerialName("Running")
+    @SerialName("RUNNING")
     data class Running(
         @SerialName("settings")
         val settings: TimerSettings,

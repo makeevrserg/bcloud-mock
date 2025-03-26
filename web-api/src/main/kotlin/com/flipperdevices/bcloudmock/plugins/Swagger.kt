@@ -2,20 +2,25 @@ package com.flipperdevices.bcloudmock.plugins
 
 import com.flipperdevices.bcloudmock.buildkonfig.BuildKonfig
 import io.github.smiley4.ktoropenapi.OpenApi
+import io.github.smiley4.ktoropenapi.config.ExampleEncoder
+import io.github.smiley4.ktoropenapi.config.SchemaGenerator
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktorswaggerui.swaggerUI
-import io.github.smiley4.schemakenerator.serialization.SerializationSteps.analyzeTypeUsingKotlinxSerialization
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.compileReferencingRoot
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.generateSwaggerSchema
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.handleCoreAnnotations
-import io.github.smiley4.schemakenerator.swagger.SwaggerSteps.withTitle
-import io.github.smiley4.schemakenerator.swagger.data.TitleType
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNamingStrategy
 
 fun Application.configureSwagger() {
+    val json = Json {
+        prettyPrint = true
+        encodeDefaults = true
+        explicitNulls = false
+        namingStrategy = JsonNamingStrategy.SnakeCase
+    }
+
     routing {
         // Create a route for the openapi-spec file.
         // This route will not be included in the spec.
@@ -31,18 +36,27 @@ fun Application.configureSwagger() {
 
     install(OpenApi) {
         schemas {
-            generator = { type ->
-                type
-                    // process type using kotlinx-serialization instead of reflection
-                    // requires additional dependency
-                    // "io.github.smiley4:schema-kenerator-kotlinx-serialization:<VERSION>"
-                    // see https://github.com/SMILEY4/schema-kenerator for more information
-                    .analyzeTypeUsingKotlinxSerialization()
-                    .generateSwaggerSchema()
-                    .withTitle(TitleType.SIMPLE)
-                    .handleCoreAnnotations()
-                    .compileReferencingRoot()
-            }
+            // configure the schema generator to use the default kotlinx-serializer
+            generator = SchemaGenerator.kotlinx(json)
+
+//            generator = { type ->
+//                type
+//                    // process type using kotlinx-serialization instead of reflection
+//                    // requires additional dependency
+//                    // "io.github.smiley4:schema-kenerator-kotlinx-serialization:<VERSION>"
+//                    // see https://github.com/SMILEY4/schema-kenerator for more information
+//                    .analyzeTypeUsingKotlinxSerialization()
+//                    .addJsonClassDiscriminatorProperty()
+//                    .addMissingSupertypeSubtypeRelations()
+//                    .handleNameAnnotation()
+//                    .generateSwaggerSchema()
+//                    .withTitle(TitleType.SIMPLE)
+//                    .handleCoreAnnotations()
+//                    .compileReferencingRoot()
+//            }
+        }
+        examples {
+            exampleEncoder = ExampleEncoder.kotlinx(json)
         }
         info {
             title = BuildKonfig.PROJECT_NAME

@@ -40,6 +40,12 @@ buildConfig {
         name = "FALLBACK_DB_FULL_PATH",
         value = rootProject.file("build").resolve("DB_FILE").absolutePath
     )
+
+    buildConfigField(
+        type = String::class.java,
+        name = "UID_TIMER_DATA_PATH",
+        value = rootProject.file("build").resolve("UID_TIMER_DATA").absolutePath
+    )
 }
 
 afterEvaluate {

@@ -1,5 +1,6 @@
 package com.flipperdevices.bcloudmock.dao.api
 
+import com.flipperdevices.bcloudmock.buildkonfig.BuildKonfig
 import com.flipperdevices.bcloudmock.busycloud.api.BusyCloudApi
 import com.flipperdevices.bcloudmock.busycloud.model.BSBApiUserObject
 import com.flipperdevices.bcloudmock.data.table.FirebaseTokenTable
@@ -15,10 +16,9 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import ru.astrainteractive.astralibs.serialization.StringFormatExt.parse
+import ru.astrainteractive.astralibs.serialization.StringFormatExt.parseOrDefault
 import ru.astrainteractive.astralibs.serialization.StringFormatExt.writeIntoFile
 import java.io.File
-import ru.astrainteractive.astralibs.serialization.StringFormatExt.parseOrDefault
 
 internal class DaoImpl(
     private val busyCloudApi: BusyCloudApi,
@@ -39,7 +39,7 @@ internal class DaoImpl(
 
         transaction(requireDatabase()) {
             val existedUser = UserTable.select(UserTable.id)
-                .where{UserTable.id eq user.uid}
+                .where { UserTable.id eq user.uid }
                 .map { it[UserTable.id] }
                 .firstOrNull()
                 ?.value
@@ -85,7 +85,7 @@ internal class DaoImpl(
 
     private val BSBApiUserObject.timestampFile: File
         get() {
-            val file = File("timestamps").resolve("$uid.json")
+            val file = File(BuildKonfig.UID_TIMER_DATA_PATH).resolve("$uid.json")
             file.parentFile.mkdirs()
             return file
         }

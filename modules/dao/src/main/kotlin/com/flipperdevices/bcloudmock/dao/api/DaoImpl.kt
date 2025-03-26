@@ -18,6 +18,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ru.astrainteractive.astralibs.serialization.StringFormatExt.parse
 import ru.astrainteractive.astralibs.serialization.StringFormatExt.writeIntoFile
 import java.io.File
+import ru.astrainteractive.astralibs.serialization.StringFormatExt.parseOrDefault
 
 internal class DaoImpl(
     private val busyCloudApi: BusyCloudApi,
@@ -91,10 +92,12 @@ internal class DaoImpl(
         }
     }
 
-    override suspend fun readTimestamp(token: String): Result<Unit> {
+    override suspend fun readTimestamp(token: String): Result<TimerTimestamp> {
         return runCatching {
             val user = getUserByToken(token).getOrThrow()
-            stringFormat.parse<TimerTimestamp>(user.timestampFile).getOrThrow()
+            stringFormat.parseOrDefault<TimerTimestamp>(user.timestampFile) {
+                TimerTimestamp.Pending.NotStarted
+            }
         }
     }
 }

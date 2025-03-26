@@ -12,5 +12,5 @@ interface Dao {
     suspend fun getUserByToken(token: String): Result<BSBApiUserObject>
 
     suspend fun saveTimestamp(token: String, timestamp: TimerTimestamp): Result<Unit>
-    suspend fun readTimestamp(token: String): Result<Unit>
+    suspend fun readTimestamp(token: String): Result<TimerTimestamp>
 }

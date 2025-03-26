@@ -4,7 +4,6 @@ import com.flipperdevices.bcloudmock.busycloud.api.BusyCloudApi
 import com.flipperdevices.bcloudmock.busycloud.api.BusyCloudApiImpl
 import com.flipperdevices.bcloudmock.core.logging.Slf4jLoggable
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
@@ -23,7 +22,7 @@ class BusyCloudModule {
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
-    private val httpClient = HttpClient(CIO) {
+    private val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(json)
         }

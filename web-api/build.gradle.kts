@@ -23,6 +23,7 @@ dependencies {
         implementation("io.ktor:ktor-server-content-negotiation:$ktor")
     }
     implementation(libs.smiley4.ktor.swagger)
+    implementation(libs.smiley4.ktor.openai)
     libs.versions.smiley4.kenerator.get().let { version ->
         implementation("io.github.smiley4:schema-kenerator-core:$version")
         implementation("io.github.smiley4:schema-kenerator-reflection:$version")

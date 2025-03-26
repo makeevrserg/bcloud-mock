@@ -1,6 +1,5 @@
 package com.flipperdevices.bcloudmock
 
-import com.flipperdevices.bcloudmock.core.routing.RouteRegistry
 import com.flipperdevices.bcloudmock.di.RootModule
 import com.flipperdevices.bcloudmock.plugins.configureHTTP
 import com.flipperdevices.bcloudmock.plugins.configureSecurity
@@ -18,8 +17,11 @@ internal fun Application.module(rootModule: RootModule, logger: Logger) {
     configureStatusPages()
     configureSwagger()
     routing {
-        listOf<RouteRegistry>()
-            .forEach { routeRegistry -> routeRegistry.register(this) }
+        listOf(
+            rootModule.authModule.registry,
+            rootModule.timerFetchModule.registry,
+            rootModule.timerRememberModule.registry
+        ).forEach { routeRegistry -> routeRegistry.register(this) }
     }
     logger.info("Started!")
 }

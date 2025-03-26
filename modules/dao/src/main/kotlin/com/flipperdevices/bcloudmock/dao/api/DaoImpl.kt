@@ -4,19 +4,25 @@ import com.flipperdevices.bcloudmock.busycloud.api.BusyCloudApi
 import com.flipperdevices.bcloudmock.busycloud.model.BSBApiUserObject
 import com.flipperdevices.bcloudmock.data.table.FirebaseTokenTable
 import com.flipperdevices.bcloudmock.data.table.UserTable
+import com.flipperdevices.bcloudmock.model.TimerTimestamp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
+import kotlinx.serialization.StringFormat
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.astrainteractive.astralibs.serialization.StringFormatExt.parse
+import ru.astrainteractive.astralibs.serialization.StringFormatExt.writeIntoFile
+import java.io.File
 
 internal class DaoImpl(
     private val busyCloudApi: BusyCloudApi,
-    private val databaseFlow: Flow<Database>
+    private val databaseFlow: Flow<Database>,
+    private val stringFormat: StringFormat
 ) : Dao {
     private suspend fun requireDatabase(): Database {
         return databaseFlow.first()
@@ -68,6 +74,27 @@ internal class DaoImpl(
                         )
                     }.first()
             }
+        }
+    }
+
+    private val BSBApiUserObject.timestampFile: File
+        get() {
+            val file = File("timestamps").resolve("$uid.json")
+            file.parentFile.mkdirs()
+            return file
+        }
+
+    override suspend fun saveTimestamp(token: String, timestamp: TimerTimestamp): Result<Unit> {
+        return runCatching {
+            val user = getUserByToken(token).getOrThrow()
+            stringFormat.writeIntoFile(timestamp, user.timestampFile)
+        }
+    }
+
+    override suspend fun readTimestamp(token: String): Result<Unit> {
+        return runCatching {
+            val user = getUserByToken(token).getOrThrow()
+            stringFormat.parse<TimerTimestamp>(user.timestampFile).getOrThrow()
         }
     }
 }

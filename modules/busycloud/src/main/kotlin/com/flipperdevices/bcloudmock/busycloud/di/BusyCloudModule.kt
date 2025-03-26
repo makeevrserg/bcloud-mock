@@ -17,13 +17,13 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 class BusyCloudModule {
-    val json = Json {
+    private val json = Json {
         prettyPrint = true
         isLenient = true
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
-    val httpClient = HttpClient(CIO) {
+    private val httpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(json)
         }

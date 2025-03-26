@@ -1,7 +1,9 @@
 package com.flipperdevices.bcloudmock.route.auth.di
 
 import com.flipperdevices.bcloudmock.core.routing.RouteRegistry
+import com.flipperdevices.bcloudmock.dao.di.DaoModule
+import com.flipperdevices.bcloudmock.route.auth.presentation.AuthRouteRegistry
 
-interface AuthModule {
-    val registry: RouteRegistry
+class AuthModule(daoModule: DaoModule) {
+    val registry: RouteRegistry = AuthRouteRegistry(daoModule.dao)
 }

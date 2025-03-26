@@ -1,8 +1,11 @@
 package com.flipperdevices.bcloudmock.data.di
 
 import com.flipperdevices.bcloudmock.core.buildkonfig.model.DBConnection
+import com.flipperdevices.bcloudmock.data.table.FirebaseTokenTable
+import com.flipperdevices.bcloudmock.data.table.UserTable
 import kotlinx.coroutines.flow.flow
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Slf4jSqlDebugLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -16,9 +19,10 @@ class DataModule(private val dbConnection: DBConnection) {
         )
         transaction(database) {
             addLogger(Slf4jSqlDebugLogger)
-//            SchemaUtils.create(
-//
-//            )
+            SchemaUtils.create(
+                FirebaseTokenTable,
+                UserTable
+            )
         }
         emit(database)
     }

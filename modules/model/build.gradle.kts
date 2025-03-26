@@ -6,6 +6,7 @@ plugins {
 dependencies {
     // Serialization
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlin.datetime)
     // Services
     implementation(projects.modules.buildKonfig)
     implementation(projects.modules.busycloud)

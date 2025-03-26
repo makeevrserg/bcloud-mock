@@ -23,10 +23,13 @@ klibs-kdi = "1.4.2" # https://github.com/makeevrserg/klibs.kdi
 smiley4-ktor-swagger = "3.0.0" # https://github.com/SMILEY4/ktor-swagger-ui
 smiley4-kenerator = "1.0.1" # https://github.com/SMILEY4/schema-kenerator
 
+astralibs = "3.19.3" # https://github.com/Astra-Interactive/AstraLibs
+
 [libraries]
 # Klibs
 klibs-gradleplugin-core = { module = "ru.astrainteractive.gradleplugin:convention", version.ref = "klibs-gradleplugin" }
 klibs-kdi = { module = "ru.astrainteractive.klibs:kdi", version.ref = "klibs-kdi" }
+astralibs = { module = "ru.astrainteractive.astralibs:core", version.ref = "astralibs" }
 # Koltin
 kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
 

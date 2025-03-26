@@ -38,7 +38,12 @@ internal class DaoImpl(
         val user = busyCloudApi.authMe(token).getOrThrow()
 
         transaction(requireDatabase()) {
-            val id = UserTable.insertAndGetId {
+            val existedUser = UserTable.select(UserTable.id)
+                .where{UserTable.id eq user.uid}
+                .map { it[UserTable.id] }
+                .firstOrNull()
+                ?.value
+            val id = existedUser ?: UserTable.insertAndGetId {
                 it[UserTable.id] = user.uid
                 it[UserTable.username] = user.username
                 it[UserTable.displayName] = user.displayName
@@ -87,14 +92,14 @@ internal class DaoImpl(
 
     override suspend fun saveTimestamp(token: String, timestamp: TimerTimestamp): Result<Unit> {
         return runCatching {
-            val user = getUserByToken(token).getOrThrow()
+            val user = getUserByToken(token).getOrNull() ?: insertUserToken(token).getOrThrow()
             stringFormat.writeIntoFile(timestamp, user.timestampFile)
         }
     }
 
     override suspend fun readTimestamp(token: String): Result<TimerTimestamp> {
         return runCatching {
-            val user = getUserByToken(token).getOrThrow()
+            val user = getUserByToken(token).getOrNull() ?: insertUserToken(token).getOrThrow()
             stringFormat.parseOrDefault<TimerTimestamp>(user.timestampFile) {
                 TimerTimestamp.Pending.NotStarted
             }

@@ -21,9 +21,16 @@ class TimerRememberRouteRegistry(
                 val context = this.call
                 val token = context.request.headers[HttpHeaders.Authorization] ?: error("Token is required")
                 val timestamp = context.receive<TimerTimestamp>()
-                dao.saveTimestamp(token, timestamp).getOrThrow()
-                timerChangedController.timerChanged(uid = dao.getUserByToken(token).getOrThrow().uid)
-                context.respond(timestamp)
+                val lastTimestamp = dao.readTimestampByToken(token)
+                    .getOrNull()
+                    ?: TimerTimestamp.Pending.NotStarted
+                if (timestamp.lastSync > lastTimestamp.lastSync) {
+                    dao.saveTimestamp(token, timestamp).getOrThrow()
+                    timerChangedController.timerChanged(uid = dao.getUserByToken(token).getOrThrow().uid)
+                    context.respond(timestamp)
+                } else {
+                    context.respond(lastTimestamp)
+                }
             }
         )
     }

@@ -46,6 +46,12 @@ buildConfig {
         name = "UID_TIMER_DATA_PATH",
         value = rootProject.file("build").resolve("UID_TIMER_DATA").absolutePath
     )
+
+    buildConfigField(
+        type = String::class.java,
+        name = "PRIVATE_KEY_JSON_PATH",
+        value = rootProject.file("private-key.json").absolutePath
+    )
 }
 
 afterEvaluate {

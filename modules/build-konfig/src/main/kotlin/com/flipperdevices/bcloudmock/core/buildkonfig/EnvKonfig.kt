@@ -3,6 +3,7 @@ package com.flipperdevices.bcloudmock.core.buildkonfig
 import com.flipperdevices.bcloudmock.buildkonfig.BuildKonfig
 import com.flipperdevices.bcloudmock.core.buildkonfig.model.DBConnection
 import com.flipperdevices.bcloudmock.core.buildkonfig.model.DBType
+import java.io.File
 import java.net.InetAddress
 
 object EnvKonfig {
@@ -24,6 +25,12 @@ object EnvKonfig {
         val FBACKEND_DB_FULL_PATH: String
             get() = KSystem.getenvOrNull("DB_FULL_PATH")
                 ?: BuildKonfig.FALLBACK_DB_FULL_PATH
+    }
+
+    object Firebase {
+        val PRIVATE_KEY
+            get() = KSystem.getenvOrNull("PRIVATE_KEY_JSON_PATH")?.let(::File)
+                ?: File(BuildKonfig.PRIVATE_KEY_JSON_PATH)
     }
 
     val dbConnection: DBConnection

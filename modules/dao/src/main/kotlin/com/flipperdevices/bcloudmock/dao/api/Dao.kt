@@ -14,7 +14,8 @@ interface Dao {
 
     suspend fun saveTimestamp(token: String, timestamp: TimerTimestamp): Result<Unit>
 
-    suspend fun readTimestamp(token: String): Result<TimerTimestamp>
+    suspend fun readTimestampByToken(token: String): Result<TimerTimestamp>
+    suspend fun readTimestampByUid(uid: String): Result<TimerTimestamp>
 
     suspend fun getUserTokenWithTimestamp(id: String): Result<UserWithTimestamp>
 }

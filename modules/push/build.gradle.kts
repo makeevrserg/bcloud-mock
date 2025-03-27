@@ -5,6 +5,7 @@ plugins {
 dependencies {
     implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
     implementation("com.google.firebase:firebase-admin:9.3.0")
+    implementation(libs.kotlin.serialization.json)
     // Local
     implementation(projects.modules.buildKonfig)
     implementation(projects.modules.core)

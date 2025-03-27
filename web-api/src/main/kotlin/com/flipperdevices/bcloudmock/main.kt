@@ -16,6 +16,7 @@ fun main() {
     embeddedServer(
         factory = Netty,
         module = { module(rootModule, logger) },
-        port = EnvKonfig.FBACKEND_PORT
+        port = EnvKonfig.FBACKEND_PORT,
+        host = "192.168.0.108"
     ).start(wait = true)
 }

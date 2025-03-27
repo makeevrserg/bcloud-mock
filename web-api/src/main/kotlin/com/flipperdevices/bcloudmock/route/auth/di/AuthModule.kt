@@ -2,15 +2,15 @@ package com.flipperdevices.bcloudmock.route.auth.di
 
 import com.flipperdevices.bcloudmock.core.routing.RouteRegistry
 import com.flipperdevices.bcloudmock.dao.di.DaoModule
-import com.flipperdevices.bcloudmock.push.di.PushModule
 import com.flipperdevices.bcloudmock.route.auth.presentation.AuthRouteRegistry
+import com.flipperdevices.bcloudmock.route.timer.remember.presentation.TimerChangedController
 
 class AuthModule(
     daoModule: DaoModule,
-    pushModule: PushModule
+    timerChangedController: TimerChangedController
 ) {
     val registry: RouteRegistry = AuthRouteRegistry(
         dao = daoModule.dao,
-        androidPushService = pushModule.androidPushService
+        timerChangedController = timerChangedController
     )
 }

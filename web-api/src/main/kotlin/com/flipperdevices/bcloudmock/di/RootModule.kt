@@ -9,6 +9,7 @@ import com.flipperdevices.bcloudmock.push.di.PushModule
 import com.flipperdevices.bcloudmock.route.auth.di.AuthModule
 import com.flipperdevices.bcloudmock.route.timer.fetch.di.TimerFetchModule
 import com.flipperdevices.bcloudmock.route.timer.remember.di.TimerRememberModuleModule
+import com.flipperdevices.bcloudmock.route.timer.remember.presentation.TimerChangedController
 
 class RootModule {
     val coreModule = CoreModule.Default()
@@ -16,21 +17,25 @@ class RootModule {
         dbConnection = EnvKonfig.dbConnection
     )
     private val busyCloudModule = BusyCloudModule()
-    private val daoModule = DaoModule(
+    val daoModule = DaoModule(
         databaseModule = databaseModule,
         busyCloudModule = busyCloudModule,
         coreModule = coreModule
     )
-    private val pushModule = PushModule()
+    private val pushModule = PushModule(coreModule)
+    private val timerChangedController = TimerChangedController(
+        dao = daoModule.dao,
+        androidPushService = pushModule.androidPushService
+    )
     val authModule = AuthModule(
         daoModule = daoModule,
-        pushModule = pushModule
+        timerChangedController = timerChangedController
     )
     val timerFetchModule = TimerFetchModule(
         daoModule = daoModule
     )
     val timerRememberModule = TimerRememberModuleModule(
         daoModule = daoModule,
-        pushModule = pushModule
+        timerChangedController = timerChangedController
     )
 }

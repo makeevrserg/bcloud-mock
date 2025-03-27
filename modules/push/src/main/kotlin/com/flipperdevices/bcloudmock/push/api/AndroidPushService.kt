@@ -7,25 +7,29 @@ import com.flipperdevices.bcloudmock.push.model.FirebaseAppContext
 import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
-import com.google.firebase.messaging.Notification
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.Json
 
 class AndroidPushService(
-    private val firebaseAppContext: FirebaseAppContext
+    private val firebaseAppContext: FirebaseAppContext,
+    private val json: Json
 ) : PushService<AndroidFirebaseToken>,
     Loggable by Slf4jLoggable("AndroidPushService") {
-
-    override fun sendPush(token: AndroidFirebaseToken) {
-        info { "#sendPush $token" }
+    override fun <K> sendPush(
+        token: AndroidFirebaseToken,
+        data: K,
+        serializer: KSerializer<K>
+    ) {
+        info { "#sendPush $token data: $data" }
         val message: Message = Message.builder()
+            .putData("data", json.encodeToString(serializer, data))
             .setAndroidConfig(
                 AndroidConfig.builder()
                     .setPriority(AndroidConfig.Priority.HIGH)
                     .build()
             )
-            .setNotification(Notification.builder().setTitle("Hello!").build())
             .setToken(token.value)
             .build()
-
         try {
             val response = FirebaseMessaging.getInstance(firebaseAppContext.firebaseApp).send(message)
             info { "Successfully sent message: $response" }

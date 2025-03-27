@@ -9,12 +9,13 @@ import com.google.firebase.messaging.ApnsConfig
 import com.google.firebase.messaging.Aps
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.Message
+import kotlinx.serialization.KSerializer
 
 class ApplePushService(
     private val firebaseAppContext: FirebaseAppContext
 ) : PushService<AppleFirebaseToken>,
     Loggable by Slf4jLoggable("IosPushService") {
-    override fun sendPush(token: AppleFirebaseToken) {
+    override fun <K> sendPush(token: AppleFirebaseToken, data: K, serializer: KSerializer<K>) {
         val message: Message = Message.builder()
             .setAndroidConfig(
                 AndroidConfig.builder()

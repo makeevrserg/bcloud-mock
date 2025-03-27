@@ -112,9 +112,18 @@ internal class DaoImpl(
         }
     }
 
-    override suspend fun readTimestamp(token: String): Result<TimerTimestamp> {
+    override suspend fun readTimestampByToken(token: String): Result<TimerTimestamp> {
         return runCatching {
             val user = getUserByToken(token).getOrNull() ?: insertUserToken(token, null).getOrThrow()
+            stringFormat.parseOrDefault<TimerTimestamp>(user.timestampFile) {
+                TimerTimestamp.Pending.NotStarted
+            }
+        }
+    }
+
+    override suspend fun readTimestampByUid(uid: String): Result<TimerTimestamp> {
+        return runCatching {
+            val user = getUserById(uid).getOrThrow()
             stringFormat.parseOrDefault<TimerTimestamp>(user.timestampFile) {
                 TimerTimestamp.Pending.NotStarted
             }

@@ -16,6 +16,7 @@ class TimerFetchRouteRegistry(
             body = {
                 val context = this.call
                 val token = context.request.headers["Authorization"] ?: error("Token is required")
+                val firebaseToken = context.request.headers["Authorization-Firebase"]
                 val resultTimestamp = dao.readTimestamp(token).getOrThrow()
                 context.respond(resultTimestamp)
             }

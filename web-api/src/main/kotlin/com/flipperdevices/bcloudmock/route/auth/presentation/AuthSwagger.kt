@@ -13,6 +13,9 @@ object AuthSwagger {
             headerParameter("Authorization", typeOf<String>()) {
                 description = "Authorization token"
             }
+            headerParameter("Authorization-Firebase", typeOf<String?>()) {
+                description = "Authorization token for firebase"
+            }
         }
         response {
             HttpStatusCode.OK to {

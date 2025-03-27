@@ -1,6 +1,7 @@
 package com.flipperdevices.bcloudmock.data.di
 
 import com.flipperdevices.bcloudmock.core.buildkonfig.model.DBConnection
+import com.flipperdevices.bcloudmock.data.table.BCloudTokenTable
 import com.flipperdevices.bcloudmock.data.table.FirebaseTokenTable
 import com.flipperdevices.bcloudmock.data.table.UserTable
 import kotlinx.coroutines.flow.flow
@@ -21,8 +22,9 @@ class DataModule(private val dbConnection: DBConnection) {
         transaction(database) {
             addLogger(Slf4jSqlDebugLogger)
             SchemaUtils.create(
+                BCloudTokenTable,
                 FirebaseTokenTable,
-                UserTable
+                UserTable,
             )
         }
         emit(database)

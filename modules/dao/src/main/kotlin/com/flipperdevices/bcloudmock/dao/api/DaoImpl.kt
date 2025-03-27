@@ -3,6 +3,8 @@ package com.flipperdevices.bcloudmock.dao.api
 import com.flipperdevices.bcloudmock.buildkonfig.BuildKonfig
 import com.flipperdevices.bcloudmock.busycloud.api.BusyCloudApi
 import com.flipperdevices.bcloudmock.busycloud.model.BSBApiUserObject
+import com.flipperdevices.bcloudmock.dao.model.UserWithTimestamp
+import com.flipperdevices.bcloudmock.data.table.BCloudTokenTable
 import com.flipperdevices.bcloudmock.data.table.FirebaseTokenTable
 import com.flipperdevices.bcloudmock.data.table.UserTable
 import com.flipperdevices.bcloudmock.model.TimerTimestamp
@@ -14,6 +16,7 @@ import kotlinx.serialization.StringFormat
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.astrainteractive.astralibs.serialization.StringFormatExt.parseOrDefault
@@ -30,12 +33,11 @@ internal class DaoImpl(
     }
 
     override suspend fun insertUserToken(
-        token: String
+        token: String,
+        tokenFirebase: String?
     ): Result<BSBApiUserObject> = runCatching {
         // Don't add same token twice
-        if (getUserByToken(token).isSuccess) error("User already exist with this token")
-
-        val user = busyCloudApi.authMe(token).getOrThrow()
+        val user = getUserByToken(token).getOrNull() ?: busyCloudApi.authMe(token).getOrThrow()
 
         transaction(requireDatabase()) {
             val existedUser = UserTable.select(UserTable.id)
@@ -52,23 +54,25 @@ internal class DaoImpl(
                 it[UserTable.updatedAt] = user.updatedAt.toJavaLocalDateTime()
             }.value
 
-            FirebaseTokenTable.insert {
-                it[FirebaseTokenTable.token] = token
-                it[FirebaseTokenTable.user_id] = id
+            BCloudTokenTable.insertIgnore {
+                it[BCloudTokenTable.token] = token
+                it[BCloudTokenTable.user_id] = id
+            }
+            tokenFirebase?.let {
+                FirebaseTokenTable.insertIgnore {
+                    it[FirebaseTokenTable.token] = tokenFirebase
+                    it[FirebaseTokenTable.user_id] = id
+                }
             }
         }
         user
     }
 
-    override suspend fun getUserByToken(token: String): Result<BSBApiUserObject> {
+    private suspend fun getUserById(id: String): Result<BSBApiUserObject> {
         return runCatching {
             transaction(requireDatabase()) {
-                val userIds = FirebaseTokenTable.select(FirebaseTokenTable.user_id)
-                    .where { FirebaseTokenTable.token eq token }
-                    .map { resultRow -> resultRow[FirebaseTokenTable.user_id].value }
-
                 UserTable.selectAll()
-                    .where { UserTable.id inList userIds }
+                    .where { UserTable.id eq id }
                     .map { resultRow ->
                         BSBApiUserObject(
                             uid = resultRow[UserTable.id].value,
@@ -83,6 +87,18 @@ internal class DaoImpl(
         }
     }
 
+    override suspend fun getUserByToken(token: String): Result<BSBApiUserObject> {
+        return runCatching {
+            val userId = transaction(requireDatabase()) {
+                BCloudTokenTable.select(BCloudTokenTable.user_id)
+                    .where { BCloudTokenTable.token eq token }
+                    .map { resultRow -> resultRow[BCloudTokenTable.user_id].value }
+                    .first()
+            }
+            getUserById(userId).getOrThrow()
+        }
+    }
+
     private val BSBApiUserObject.timestampFile: File
         get() {
             val file = File(BuildKonfig.UID_TIMER_DATA_PATH).resolve("$uid.json")
@@ -92,17 +108,37 @@ internal class DaoImpl(
 
     override suspend fun saveTimestamp(token: String, timestamp: TimerTimestamp): Result<Unit> {
         return runCatching {
-            val user = getUserByToken(token).getOrNull() ?: insertUserToken(token).getOrThrow()
+            val user = getUserByToken(token).getOrNull() ?: insertUserToken(token, null).getOrThrow()
             stringFormat.writeIntoFile(timestamp, user.timestampFile)
         }
     }
 
     override suspend fun readTimestamp(token: String): Result<TimerTimestamp> {
         return runCatching {
-            val user = getUserByToken(token).getOrNull() ?: insertUserToken(token).getOrThrow()
+            val user = getUserByToken(token).getOrNull() ?: insertUserToken(token, null).getOrThrow()
             stringFormat.parseOrDefault<TimerTimestamp>(user.timestampFile) {
                 TimerTimestamp.Pending.NotStarted
             }
+        }
+    }
+
+    override suspend fun getUserTokenWithTimestamp(id: String): Result<UserWithTimestamp> {
+        return runCatching {
+            val user = getUserById(id).getOrThrow()
+            val tokensFirebase = transaction(requireDatabase()) {
+                FirebaseTokenTable.select(FirebaseTokenTable.token)
+                    .where { FirebaseTokenTable.user_id eq id }
+                    .map { it[FirebaseTokenTable.token] }
+
+            }
+            val timestamp = stringFormat.parseOrDefault<TimerTimestamp>(user.timestampFile) {
+                TimerTimestamp.Pending.NotStarted
+            }
+            UserWithTimestamp(
+                userObject = user,
+                timestamp = timestamp,
+                firebaseTokens = tokensFirebase
+            )
         }
     }
 }

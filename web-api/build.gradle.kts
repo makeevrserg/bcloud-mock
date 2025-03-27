@@ -48,6 +48,7 @@ dependencies {
     implementation(projects.modules.dao)
     implementation(projects.modules.data)
     implementation(projects.modules.busycloud)
+    implementation(projects.modules.push)
 }
 
 application {

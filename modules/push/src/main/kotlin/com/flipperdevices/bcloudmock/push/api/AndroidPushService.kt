@@ -15,6 +15,7 @@ class AndroidPushService(
     Loggable by Slf4jLoggable("AndroidPushService") {
 
     override fun sendPush(token: AndroidFirebaseToken) {
+        info { "#sendPush $token" }
         val message: Message = Message.builder()
             .setAndroidConfig(
                 AndroidConfig.builder()

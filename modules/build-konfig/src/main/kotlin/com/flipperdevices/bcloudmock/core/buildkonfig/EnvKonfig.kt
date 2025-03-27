@@ -28,9 +28,15 @@ object EnvKonfig {
     }
 
     object Firebase {
-        val PRIVATE_KEY
-            get() = KSystem.getenvOrNull("PRIVATE_KEY_JSON_PATH")?.let(::File)
-                ?: File(BuildKonfig.PRIVATE_KEY_JSON_PATH)
+        val PRIVATE_KEY: File
+            get() {
+                val file = KSystem.getenvOrNull("PRIVATE_KEY_JSON_PATH")?.let(::File)
+                    ?: File(BuildKonfig.PRIVATE_KEY_JSON_PATH)
+                if (!file.exists() || file.length() == 0L) {
+                    error("private-key.json not found!")
+                }
+                return file
+            }
     }
 
     val dbConnection: DBConnection

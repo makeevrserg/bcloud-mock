@@ -14,7 +14,6 @@ import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.serialization.StringFormat
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.selectAll
@@ -129,7 +128,6 @@ internal class DaoImpl(
                 FirebaseTokenTable.select(FirebaseTokenTable.token)
                     .where { FirebaseTokenTable.user_id eq id }
                     .map { it[FirebaseTokenTable.token] }
-
             }
             val timestamp = stringFormat.parseOrDefault<TimerTimestamp>(user.timestampFile) {
                 TimerTimestamp.Pending.NotStarted

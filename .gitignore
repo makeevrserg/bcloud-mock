@@ -3,6 +3,7 @@
 .kotlin
 build
 private-key.json
+jars
 
 modules/build-konfig/build
 modules/core/build

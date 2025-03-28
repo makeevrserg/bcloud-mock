@@ -1,13 +1,14 @@
 package com.flipperdevices.bcloudmock.dao.api
 
 import com.flipperdevices.bcloudmock.busycloud.model.BSBApiUserObject
+import com.flipperdevices.bcloudmock.dao.model.TimestampChangedEvent
 import com.flipperdevices.bcloudmock.dao.model.UserWithTimestamp
 import com.flipperdevices.bcloudmock.model.TimerTimestamp
+import kotlinx.coroutines.flow.Flow
 
 interface Dao {
-    /**
-     * Inserts new token and fetch information about user
-     */
+    val timestampChangedFlow: Flow<TimestampChangedEvent>
+
     suspend fun insertUserToken(token: String, tokenFirebase: String?): Result<BSBApiUserObject>
 
     suspend fun getUserByToken(token: String): Result<BSBApiUserObject>

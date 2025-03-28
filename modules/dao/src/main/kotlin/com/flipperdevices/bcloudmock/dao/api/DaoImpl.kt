@@ -3,12 +3,14 @@ package com.flipperdevices.bcloudmock.dao.api
 import com.flipperdevices.bcloudmock.buildkonfig.BuildKonfig
 import com.flipperdevices.bcloudmock.busycloud.api.BusyCloudApi
 import com.flipperdevices.bcloudmock.busycloud.model.BSBApiUserObject
+import com.flipperdevices.bcloudmock.dao.model.TimestampChangedEvent
 import com.flipperdevices.bcloudmock.dao.model.UserWithTimestamp
 import com.flipperdevices.bcloudmock.data.table.BCloudTokenTable
 import com.flipperdevices.bcloudmock.data.table.FirebaseTokenTable
 import com.flipperdevices.bcloudmock.data.table.UserTable
 import com.flipperdevices.bcloudmock.model.TimerTimestamp
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toKotlinLocalDateTime
@@ -27,6 +29,8 @@ internal class DaoImpl(
     private val databaseFlow: Flow<Database>,
     private val stringFormat: StringFormat
 ) : Dao {
+    override val timestampChangedFlow = MutableSharedFlow<TimestampChangedEvent>(1)
+
     private suspend fun requireDatabase(): Database {
         return databaseFlow.first()
     }
@@ -108,6 +112,12 @@ internal class DaoImpl(
     override suspend fun saveTimestamp(token: String, timestamp: TimerTimestamp): Result<Unit> {
         return runCatching {
             val user = getUserByToken(token).getOrNull() ?: insertUserToken(token, null).getOrThrow()
+            timestampChangedFlow.emit(
+                TimestampChangedEvent(
+                    user = user,
+                    timestamp = timestamp
+                )
+            )
             stringFormat.writeIntoFile(timestamp, user.timestampFile)
         }
     }
@@ -136,6 +146,7 @@ internal class DaoImpl(
             val tokensFirebase = transaction(requireDatabase()) {
                 FirebaseTokenTable.select(FirebaseTokenTable.token)
                     .where { FirebaseTokenTable.user_id eq id }
+                    .distinct()
                     .map { it[FirebaseTokenTable.token] }
             }
             val timestamp = stringFormat.parseOrDefault<TimerTimestamp>(user.timestampFile) {
@@ -144,7 +155,7 @@ internal class DaoImpl(
             UserWithTimestamp(
                 userObject = user,
                 timestamp = timestamp,
-                firebaseTokens = tokensFirebase
+                firebaseTokens = tokensFirebase.distinct()
             )
         }
     }

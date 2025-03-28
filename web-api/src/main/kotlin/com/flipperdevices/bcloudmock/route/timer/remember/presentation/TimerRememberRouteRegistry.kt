@@ -1,5 +1,7 @@
 package com.flipperdevices.bcloudmock.route.timer.remember.presentation
 
+import com.flipperdevices.bcloudmock.core.logging.Loggable
+import com.flipperdevices.bcloudmock.core.logging.Slf4jLoggable
 import com.flipperdevices.bcloudmock.core.routing.RouteRegistry
 import com.flipperdevices.bcloudmock.dao.api.Dao
 import com.flipperdevices.bcloudmock.model.TimerTimestamp
@@ -12,8 +14,8 @@ import io.ktor.server.routing.Routing
 class TimerRememberRouteRegistry(
     private val dao: Dao,
     private val timerChangedController: TimerChangedController
-) : RouteRegistry {
-    private fun Routing.authRoute() {
+) : RouteRegistry, Loggable by Slf4jLoggable("AuthRouteRegistry") {
+    private fun Routing.rememberTimerRoute() {
         post(
             path = "/api/v0/timer/remember",
             builder = { with(TimerRememberSwagger) { createSwaggerDefinition() } },
@@ -24,8 +26,16 @@ class TimerRememberRouteRegistry(
                 val lastTimestamp = dao.readTimestampByToken(token)
                     .getOrNull()
                     ?: TimerTimestamp.Pending.NotStarted
-                if (timestamp.lastSync > lastTimestamp.lastSync) {
+
+                if (lastTimestamp is TimerTimestamp.Pending && timestamp is TimerTimestamp.Pending) {
+                    context.respond(lastTimestamp)
+                } else if (lastTimestamp.lastSync == timestamp.lastSync) {
+                    context.respond(lastTimestamp)
+                } else if (lastTimestamp == timestamp) {
+                    context.respond(lastTimestamp)
+                } else if (timestamp.lastSync > lastTimestamp.lastSync) {
                     dao.saveTimestamp(token, timestamp).getOrThrow()
+                    info { "#rememberTimerRoute" }
                     timerChangedController.timerChanged(uid = dao.getUserByToken(token).getOrThrow().uid)
                     context.respond(timestamp)
                 } else {
@@ -36,6 +46,6 @@ class TimerRememberRouteRegistry(
     }
 
     override fun register(routing: Routing) {
-        routing.authRoute()
+        routing.rememberTimerRoute()
     }
 }

@@ -21,6 +21,7 @@ dependencies {
         implementation("io.ktor:ktor-server-cors:$ktor")
         implementation("io.ktor:ktor-server-resources:$ktor")
         implementation("io.ktor:ktor-server-content-negotiation:$ktor")
+        implementation("io.ktor:ktor-server-websockets:$ktor")
     }
     implementation(libs.smiley4.ktor.swagger)
     implementation(libs.smiley4.ktor.openai)
